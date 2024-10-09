@@ -4,19 +4,18 @@ import net.engineeringdigest.journalApp.entity.JournalEntry;
 import net.engineeringdigest.journalApp.service.JournalEntryService;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @RestController
 @RequestMapping("/journal")
 public class JournalEntryController {
 
     @Autowired
-    JournalEntryService journalEntryService;
+    private JournalEntryService journalEntryService;
 
     @GetMapping
     public List<JournalEntry> getAll(){
@@ -28,18 +27,29 @@ public class JournalEntryController {
         return journalEntryService.addJournal(entry);
     }
 
-//    @GetMapping("id/{myId}")
-//    public JournalEntry getJournalEntryById(@PathVariable ObjectId myId){
-////        return journalEntries.get(myId);
-//    }
-//
-//    @DeleteMapping
-//    public Boolean deleteJournalEntry(){
-//
-//    }
-//
+    @GetMapping("id/{myId}")
+    public ResponseEntity<?> getJournalEntryById(@PathVariable ObjectId myId){
+        Optional<JournalEntry> journalEntry = journalEntryService.getJournalEntryById(myId);
+        if(journalEntry.isPresent()){
+            return new ResponseEntity<>(journalEntry, HttpStatus.CREATED);
+        }
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+
+    @DeleteMapping("id/{id}")
+    public ResponseEntity<?> deleteJournalEntry(@PathVariable ObjectId id){
+        journalEntryService.removeJournal(id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
 //    @PutMapping("id/{id}")
-//    public JournalEntry editEntry(@PathVariable ObjectId id){
+//    public ResponseEntity<?> editEntry(@PathVariable ObjectId id, @RequestBody JournalEntry newEntry){
+//        Optional<JournalEntry> journalEntry = journalEntryService.getJournalEntryById(id);
+//        if(journalEntry.isPresent()){
+//            journalEntry.setTitle("abc");
+//        }
+//        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+//
 //
 //    }
 
